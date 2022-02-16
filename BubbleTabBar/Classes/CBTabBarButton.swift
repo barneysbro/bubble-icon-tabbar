@@ -39,9 +39,10 @@ public class CBTabBarButton: UIControl {
         configureSubviews()
     }
 
-    init(item: UITabBarItem) {
+    init(item: UITabBarItem, font: UIFont? = nil) {
         super.init(frame: .zero)
         tabImage = UIImageView(image: item.image)
+        tabLabelFont = font ?? UIFont.systemFont(ofSize: 14)
         defer {
             self.item = item
             configureSubviews()
@@ -51,10 +52,10 @@ public class CBTabBarButton: UIControl {
     private var currentImage: UIImage? {
         var maybeImage: UIImage?
         if _isSelected {
-                maybeImage = item?.selectedImage ?? item?.image
-            } else {
-                maybeImage = item?.image
-            }
+            maybeImage = item?.selectedImage ?? item?.image
+        } else {
+            maybeImage = item?.image
+        }
         guard let image = maybeImage else {
             return nil
         }
@@ -88,7 +89,10 @@ public class CBTabBarButton: UIControl {
     private var tabLabel = UILabel()
     private var tabBg = UIView()
 
+    private var tabLabelFont = UIFont.systemFont(ofSize: 14)
+
     private let bgHeight: CGFloat = 42.0
+    private let bgWidth: CGFloat = (UIScreen.main.bounds.width - 20) / 6.0
     private var csFoldedBgTrailing: NSLayoutConstraint!
     private var csUnfoldedBgTrailing: NSLayoutConstraint!
     private var csFoldedLblLeading: NSLayoutConstraint!
@@ -107,8 +111,8 @@ public class CBTabBarButton: UIControl {
         tabImage.contentMode = .center
         tabImage.translatesAutoresizingMaskIntoConstraints = false
         tabLabel.translatesAutoresizingMaskIntoConstraints = false
-        tabLabel.font = UIFont.systemFont(ofSize: 14)
-        tabLabel.adjustsFontSizeToFitWidth = true
+        tabLabel.font = tabLabelFont
+        tabLabel.textAlignment = .center
         tabBg.translatesAutoresizingMaskIntoConstraints = false
         tabBg.isUserInteractionEnabled = false
         tabImage.setContentHuggingPriority(.required, for: .horizontal)
@@ -124,7 +128,8 @@ public class CBTabBarButton: UIControl {
         tabBg.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         tabBg.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         tabBg.heightAnchor.constraint(equalToConstant: bgHeight).isActive = true
-        
+        tabBg.widthAnchor.constraint(greaterThanOrEqualToConstant: bgWidth).isActive = true
+
         if rightToLeft {
             tabImage.trailingAnchor.constraint(equalTo: tabBg.trailingAnchor, constant: -bgHeight/2.0).isActive = true
             tabImage.centerYAnchor.constraint(equalTo: tabBg.centerYAnchor).isActive = true
@@ -138,11 +143,11 @@ public class CBTabBarButton: UIControl {
             tabImage.centerYAnchor.constraint(equalTo: tabBg.centerYAnchor).isActive = true
             tabLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
             csFoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
-            csUnfoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: tabImage.trailingAnchor, constant: bgHeight/4.0)
+            csUnfoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: bgHeight/4.0)
             csFoldedBgTrailing = tabImage.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -bgHeight/2.0)
-            csUnfoldedBgTrailing = tabLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -bgHeight/2.0)
+            csUnfoldedBgTrailing = tabLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -bgHeight/4.0)
         }
-        
+
         fold()
         setNeedsLayout()
     }
@@ -158,6 +163,7 @@ public class CBTabBarButton: UIControl {
         }
         UIView.transition(with: tabImage, duration: duration, options: [.transitionCrossDissolve], animations: {
             self.tabImage.tintColor = .black
+            self.tabImage.isHidden = false
         }, completion: nil)
 
     }
@@ -173,12 +179,13 @@ public class CBTabBarButton: UIControl {
         }, completion: nil)
         UIView.transition(with: tabImage, duration: duration, options: [.transitionCrossDissolve], animations: {
             self.tabImage.tintColor = self.tintColor
+            self.tabImage.isHidden = true
         }, completion: nil)
     }
 
     public func setSelected(_ selected: Bool, animationDuration duration: Double = 0.0) {
         _isSelected = selected
-         UIView.transition(with: tabImage, duration: 0.05, options: [.beginFromCurrentState], animations: {
+        UIView.transition(with: tabImage, duration: 0.05, options: [.beginFromCurrentState], animations: {
             self.tabImage.image = self.currentImage
         }, completion: nil)
         if selected {
