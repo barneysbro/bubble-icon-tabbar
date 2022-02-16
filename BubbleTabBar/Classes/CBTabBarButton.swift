@@ -11,6 +11,7 @@ import UIKit
 public class CBTabBarItem: UITabBarItem {
     @IBInspectable public var tintColor: UIColor?
     @IBInspectable public var rightToLeft:Bool = false
+    @IBInspectable public var font: UIFont? = nil
 }
 
 public class CBTabBarButton: UIControl {
@@ -39,10 +40,9 @@ public class CBTabBarButton: UIControl {
         configureSubviews()
     }
 
-    init(item: UITabBarItem, font: UIFont? = nil) {
+    init(item: UITabBarItem) {
         super.init(frame: .zero)
         tabImage = UIImageView(image: item.image)
-        tabLabelFont = font ?? UIFont.systemFont(ofSize: 14)
         defer {
             self.item = item
             configureSubviews()
@@ -71,6 +71,7 @@ public class CBTabBarButton: UIControl {
                     tintColor = color
                 }
                 rightToLeft = tabItem.rightToLeft
+                tabLabelFont = tabItem.font ?? UIFont.systemFont(ofSize: 14)
             }
         }
     }
@@ -139,11 +140,11 @@ public class CBTabBarButton: UIControl {
             csFoldedBgTrailing = tabImage.trailingAnchor.constraint(equalTo: tabBg.leadingAnchor, constant: bgHeight/2.0)
             csUnfoldedBgTrailing = tabLabel.trailingAnchor.constraint(equalTo: tabImage.leadingAnchor, constant: -bgHeight/2.0)
         } else {
-            tabImage.leadingAnchor.constraint(equalTo: tabBg.leadingAnchor, constant: bgHeight/2.0).isActive = true
+            tabImage.leadingAnchor.constraint(equalTo: tabBg.leadingAnchor, constant: bgHeight/4.0).isActive = true
             tabImage.centerYAnchor.constraint(equalTo: tabBg.centerYAnchor).isActive = true
             tabLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
             csFoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
-            csUnfoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: bgHeight/4.0)
+            csUnfoldedLblLeading = tabLabel.leadingAnchor.constraint(equalTo: tabImage.trailingAnchor, constant: bgHeight/4.0)
             csFoldedBgTrailing = tabImage.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -bgHeight/2.0)
             csUnfoldedBgTrailing = tabLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -bgHeight/4.0)
         }
@@ -163,7 +164,7 @@ public class CBTabBarButton: UIControl {
         }
         UIView.transition(with: tabImage, duration: duration, options: [.transitionCrossDissolve], animations: {
             self.tabImage.tintColor = .black
-            self.tabImage.isHidden = false
+//            self.tabImage.isHidden = false
         }, completion: nil)
 
     }
@@ -179,7 +180,7 @@ public class CBTabBarButton: UIControl {
         }, completion: nil)
         UIView.transition(with: tabImage, duration: duration, options: [.transitionCrossDissolve], animations: {
             self.tabImage.tintColor = self.tintColor
-            self.tabImage.isHidden = true
+//            self.tabImage.isHidden = true
         }, completion: nil)
     }
 
