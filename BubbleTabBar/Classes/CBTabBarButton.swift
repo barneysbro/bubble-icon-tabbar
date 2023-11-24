@@ -10,6 +10,7 @@ import UIKit
 
 public class CBTabBarItem: UITabBarItem {
     @IBInspectable public var tintColor: UIColor?
+    @IBInspectable public var unSelectTintColor: UIColor?
     @IBInspectable public var rightToLeft:Bool = false
     @IBInspectable public var font: UIFont? = nil
 }
@@ -70,6 +71,9 @@ public class CBTabBarButton: UIControl {
                 if let color = tabItem.tintColor {
                     tintColor = color
                 }
+                if let subColor = tabItem.unSelectTintColor {
+                    unSelectTintColor = subColor
+                }
                 rightToLeft = tabItem.rightToLeft
                 tabLabelFont = tabItem.font ?? UIFont.systemFont(ofSize: 14)
             }
@@ -83,6 +87,14 @@ public class CBTabBarButton: UIControl {
             }
             tabLabel.textColor = tintColor
             tabBg.backgroundColor = tintColor.withAlphaComponent(0.2)
+        }
+    }
+    
+    public var unSelectTintColor: UIColor! {
+        didSet {
+            if !_isSelected {
+                tabImage.tintColor = unSelectTintColor
+            }
         }
     }
 
@@ -163,8 +175,7 @@ public class CBTabBarButton: UIControl {
             self.tabLabel.alpha = 0.0
         }
         UIView.transition(with: tabImage, duration: duration, options: [.transitionCrossDissolve], animations: {
-            self.tabImage.tintColor = .black
-//            self.tabImage.isHidden = false
+            self.tabImage.tintColor = self.unSelectTintColor ?? self.tintColor
         }, completion: nil)
 
     }
